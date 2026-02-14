@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Task Master - Dark</title>
+  <!-- Inter Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+   
+  <style>
+    :root {
+      /* Dark Theme Palette */
+      --primary: #8B5CF6; /* Vivid Violet */
+      --primary-hover: #7C3AED;
+      
+      --bg-body: #121212; /* Almost Black */
+      --bg-card: #1E1E1E; /* Dark Grey Surface */
+      --bg-input: #2D2D2D;
+      
+      --text-main: #E4E6EB; /* Off-White for readability */
+      --text-light: #9CA3AF; /* Muted Grey */
+      --text-completed: #4B5563; /* Darker Grey */
+      
+      --border: #333333;
+      --shadow: 0 20px 40px rgba(0,0,0,0.6);
+      --danger: #EF4444;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background: var(--bg-body);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      color: var(--text-main);
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 480px;
+      background: var(--bg-card);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      padding: 40px;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid #333;
+    }
+
+    /* Header Section */
+    .header {
+      margin-bottom: 30px;
+    }
+
+    .header h1 {
+      font-size: 28px;
+      color: var(--text-main);
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .header p {
+      color: var(--text-light);
+      font-size: 14px;
+      margin-top: 5px;
+    }
+
+    /* Input Section */
+    .input-wrapper {
+      position: relative;
+      margin-bottom: 30px;
+    }
+
+    #input {
+      width: 100%;
+      padding: 16px 20px;
+      padding-right: 60px; /* Space for button */
+      background: var(--bg-input);
+      border: 2px solid transparent;
+      border-radius: 16px;
+      font-size: 16px;
+      color: var(--text-main);
+      transition: all 0.3s ease;
+    }
+
+    #input:focus {
+      outline: none;
+      background: var(--bg-input); /* Keep dark on focus */
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2);
+    }
+
+    #input::placeholder {
+      color: var(--text-light);
+      opacity: 0.7;
+    }
+
+    #submitbtn {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 40px;
+      height: 40px;
+      background: var(--primary);
+      border: none;
+      border-radius: 12px;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: 0.2s;
+    }
+
+    #submitbtn:hover {
+      background: var(--primary-hover);
+      transform: translateY(-50%) scale(1.05);
+      box-shadow: 0 0 10px rgba(139, 92, 246, 0.4);
+    }
+
+    /* List Section */
+    #todos {
+      list-style: none;
+    }
+
+    .todo-item {
+      background: transparent;
+      border-bottom: 1px solid var(--border);
+      padding: 16px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .todo-item:last-child {
+      border-bottom: none;
+    }
+
+    .todo-content {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      flex: 1;
+      cursor: pointer;
+    }
+
+    /* Custom Checkbox */
+    .check-circle {
+      width: 24px;
+      height: 24px;
+      border: 2px solid var(--text-light); /* Grey border */
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .check-circle span {
+      font-size: 16px;
+      color: #fff;
+      opacity: 0;
+      transform: scale(0.5);
+      transition: all 0.2s ease;
+    }
+
+    /* Checked State */
+    .todo-item.checked .check-circle {
+      background: var(--primary);
+      border-color: var(--primary);
+    }
+    
+    .todo-item.checked .check-circle span {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .todo-text {
+      font-size: 16px;
+      color: var(--text-main);
+      transition: 0.2s;
+      word-break: break-all;
+    }
+
+    .todo-item.checked .todo-text {
+      color: var(--text-completed);
+      text-decoration: line-through;
+    }
+
+    /* Delete Button */
+    .delete-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-light);
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 8px;
+      transition: 0.2s;
+      opacity: 0; /* Hidden by default */
+      transform: translateX(10px);
+    }
+
+    .todo-item:hover .delete-btn {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .delete-btn:hover {
+      background: rgba(239, 68, 68, 0.1); /* Red tint */
+      color: var(--danger);
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 40px 0;
+      display: none;
+    }
+    
+    .empty-state span {
+      font-size: 48px;
+      color: #333; /* Darker icon */
+      margin-bottom: 10px;
+      display: block;
+    }
+    
+    .empty-state p {
+        color: var(--text-light);
+    }
+
+    /* Animations */
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeOutLeft {
+      to { opacity: 0; transform: translateX(-50px); }
+    }
+
+  </style>
+</head>
+<body>
+  <section class="app-container">
+    <div class="header">
+      <h1>My Tasks</h1>
+      <p id="date-display">Getting things done</p>
+    </div>
+
+    <div class="input-wrapper">
+      <input type="text" id="input" placeholder="Add a new task...">
+      <button id="submitbtn">
+        <span class="material-icons-round">add</span>
+      </button>
+    </div>
+
+    <div class="todo-container">
+      <div id="empty-state" class="empty-state">
+        <span class="material-icons-round">task_alt</span>
+        <p>No task yet. Add a task above!</p>
+      </div>
+      <ul id="todos">
+      </ul>
+    </div>
+  </section>
+
+  <script>
+    const input = document.getElementById("input");
+    const ul = document.getElementById("todos");
+    const emptyState = document.getElementById("empty-state");
+    const dateDisplay = document.getElementById("date-display");
+
+    // Set current date
+    const options = { weekday: 'long', month: 'long', day: 'numeric' };
+    dateDisplay.textContent = new Date().toLocaleDateString('en-US', options);
+
+    // Initial check
+    checkEmpty();
+
+    function checkEmpty() {
+      if (ul.children.length === 0) {
+        emptyState.style.display = "block";
+      } else {
+        emptyState.style.display = "none";
+      }
+    }
+
+    function createTodo() {
+      const text = input.value.trim();
+      if (!text) return;
+
+      const li = document.createElement("li");
+      li.className = "todo-item";
+      
+      li.innerHTML = `
+        <div class="todo-content">
+          <div class="check-circle">
+            <span class="material-icons-round">check</span>
+          </div>
+          <span class="todo-text">${text}</span>
+        </div>
+        <button class="delete-btn">
+          <span class="material-icons-round">delete_outline</span>
+        </button>
+      `;
+
+      ul.prepend(li);
+      input.value = "";
+      checkEmpty();
+
+      // Click event for Toggle Logic
+      const contentDiv = li.querySelector(".todo-content");
+      contentDiv.addEventListener("click", () => {
+        li.classList.toggle("checked");
+      });
+
+      // Click event for Delete Logic
+      const delBtn = li.querySelector(".delete-btn");
+      delBtn.addEventListener("click", () => {
+        li.style.animation = "fadeOutLeft 0.3s forwards";
+        li.addEventListener("animationend", () => {
+          li.remove();
+          checkEmpty();
+        });
+      });
+    }
+
+    // Event Listeners
+    document.getElementById("submitbtn").addEventListener("click", createTodo);
+    
+    input.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") createTodo();
+    });
+
+  </script>
+</body>
+</html>
